@@ -1,29 +1,21 @@
-import mysql from 'mysql2';
-import colors from 'colors';
+import mysql from 'mysql2/promise';
+import colors from 'colors'
+
 
 const connectDB = async () => {
-  const dbConfig = {
-    host: process.env.MYSQL_HOST,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
-  };
-
-  const connection = mysql.createConnection(dbConfig);
-
-  connection.connect((err) => {
-    if (err) {
-      console.error(`Error connecting to MySQL: ${err.message}`.bgRed.white);
-      return;
+    try {
+        const connection = await mysql.createConnection({
+            host: process.env.MYSQL_HOST,
+            user: process.env.MYSQL_USER,
+            password: process.env.MYSQL_PASSWORD,
+            database: process.env.MYSQL_DATABASE,
+        });
+        console.log(`Connected to MySQL Database`.bgGreen.white);
+        return connection;
+    } catch (error) {
+        console.log(`Error in MySQL ${error}`.bgRed.white);
+        throw error;
     }
-    console.log(
-      `Connected to MySQL Database at ${dbConfig.host}`.bgMagenta.white
-    );
-  });
+}
 
-  connection.on('error', (err) => {
-    console.error(`MySQL connection error: ${err.message}`.bgRed.white);
-  });
-};
-
-export default connectDB;
+export default connectDB ;

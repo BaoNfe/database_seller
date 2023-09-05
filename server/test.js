@@ -3,9 +3,10 @@ import colors from 'colors';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import cors from 'cors';
-import sequelize  from './models/warehouseModel.js'; // Import sequelize and models
-
+import db from "./models/index.js";
 import warehouseRoutes from './routes/warehouseRoute.js';
+import categoryRoutes from './routes/categoryRoute.js'
+import productRoutes from './routes/productRoute.js'
 
 // Configure environment variables
 dotenv.config();
@@ -19,7 +20,9 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 // Routes
+app.use("/api/v1/category", categoryRoutes);
 app.use('/api/v1/warehouse', warehouseRoutes);
+app.use("/api/v1/product", productRoutes);
 
 // REST API
 app.get('/', (req, res) => {
@@ -30,15 +33,10 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 8080;
 
 // Start the server
-app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.DEV_MODE} mode on port ${PORT}`.bgCyan.white);
-});
+db.sequelize.sync()
+    app.listen(PORT, () => {
+        // console.log(`Server Running on ${process.env.DEV_MODE} mode.`);
+        // console.log(`MongoDB Server Running on Port ${MONGO_PORT}`.bgCyan.white);
+        console.log(`MySQL Server Running on Port ${PORT}`.bgGreen.white);
+    });
 
-// Create the MySQL table using Sequelize.sync
-sequelize.sync()
-  .then(() => {
-    console.log('All tables synchronized successfully');
-  })
-  .catch((error) => {
-    console.error('Error synchronizing tables:', error);
-  });

@@ -23,7 +23,7 @@ router.put(
 );
 
 // Get all Warehouses
-router.get("/get-warehouses", getWareHousesController); // /get-warehouses
+router.get("/get-warehouse", getWareHousesController); // /get-warehouses
 
 
 // Delete Warehouse by Name

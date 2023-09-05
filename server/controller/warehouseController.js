@@ -1,7 +1,11 @@
-import Warehouse from '../models/warehouseModel.js';
+import warehouseModel from '../models/warehouseModel.js';
+import db from "../models/index.js";
+import { Op } from "sequelize";
 import slugify from "slugify"; // Assuming the Sequelize model is named Warehouse
 import dotenv from 'dotenv'
 
+const sequelize = db.sequelize;
+const Warehouse = warehouseModel(sequelize);
 dotenv.config();
 export const createWareHouseController = async (req, res) => {
     try {
@@ -23,6 +27,17 @@ export const createWareHouseController = async (req, res) => {
                 return res.status(500).send({error: "number is require"})
             case !totalAreaVolume:
                 return res.status(500).send({error: "Area is require"})
+        }
+
+        const existingWarehouse = await Warehouse.findOne({
+            where: { name },
+        });
+
+        if (existingWarehouse) {
+            return res.status(400).json({
+                success: false,
+                error: "Warehouse with this name already exists",
+            });
         }
         const warehouse = await Warehouse.create({
             name,
@@ -51,15 +66,15 @@ export const createWareHouseController = async (req, res) => {
 };
 export const getWareHousesController = async (req, res) => {
   try {
-      const warehouses = await Warehouse.findAll({
+      const warehouse = await Warehouse.findAll({
           limit: 12,
           order: [['createdAt', 'DESC']],
       });
       res.status(200).send({
           success: true,
-          counTotal: warehouses.length,
+          counTotal: warehouse.length,
           message: 'all warehouse',
-          warehouses,
+          warehouse,
       });
   } catch (error) {
       console.log(error);
@@ -72,7 +87,7 @@ export const getWareHousesController = async (req, res) => {
 };
 export const updateWareHouseController = async (req, res) => {
   try {
-      const { name, address, province, city, district, street, number, totalAreaVolume } = req.fields;
+      const { name, province, city, district, street, number, totalAreaVolume } = req.fields;
 
       switch (true) {
           case !name:
@@ -102,7 +117,7 @@ export const updateWareHouseController = async (req, res) => {
               totalAreaVolume,
               slug: slugify(name),
           },
-          { where: { id: req.params.name }, returning: true }
+          { where: { name: req.params.name }, returning: true }
       );
 
       res.status(201).send({
@@ -121,7 +136,7 @@ export const updateWareHouseController = async (req, res) => {
 };
 export const deleteWarehouseController = async (req, res) => {
   try {
-      await Warehouse.destroy({ where: { id: req.params.name } });
+      await Warehouse.destroy({ where: { name: req.params.name } });
       res.status(200).send({
           success: true,
           message: 'Product Deleted successfully',
