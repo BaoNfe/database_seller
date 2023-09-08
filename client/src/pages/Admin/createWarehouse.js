@@ -14,6 +14,7 @@ const CreateWarehouse = () => {
   const [street, setStreet] = useState("");
   const [number, setNumber] = useState("");
   const [totalAreaVolume, setTotalArea] = useState("");
+  const [availableAreaVolume, setAvailableArea] = useState("");
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(null);
   const [updatedName, setUpdatedName] = useState("");
@@ -29,14 +30,12 @@ const CreateWarehouse = () => {
       warehouseData.append("street", street);
       warehouseData.append("number", number);
       warehouseData.append("totalAreaVolume", totalAreaVolume);
+      warehouseData.append("availableAreaVolume", totalAreaVolume);
       const { data } = axios.post(
         "/api/v1/warehouse/create-warehouse",
         warehouseData
       );
       if (data?.success) {
-        toast.error(data?.message);
-        
-      } else {
         toast.success("warehouse Created Successfully");
         getAllWarehouse();
       }
@@ -61,26 +60,26 @@ const CreateWarehouse = () => {
     getAllWarehouse();
   }, []);
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      const { data } = await axios.put(
-        `/api/v1/warehouse//update-warehouse/${selected.name}`,
-        { name: updatedName }
-      );
-      if (data?.success) {
-        toast.success(`${updatedName} is updated`);
-        setSelected(null);
-        setUpdatedName("");
-        setVisible(false);
-        getAllWarehouse();
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const handleUpdate = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     const { data } = await axios.put(
+  //       `/api/v1/warehouse//update-warehouse/${selected.id}`,
+  //       { name: updatedName }
+  //     );
+  //     if (data?.success) {
+  //       toast.success(`${updatedName} is updated`);
+  //       setSelected(null);
+  //       setUpdatedName("");
+  //       setVisible(false);
+  //       getAllWarehouse();
+  //     } else {
+  //       toast.error(data.message);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const handleDelete = async (name) => {
     try {
@@ -204,9 +203,7 @@ const CreateWarehouse = () => {
                       <button
                         className="btn btn-primary ms-2"
                         onClick={() => {
-                          setVisible(true);
-                          setUpdatedName(c.name);
-                          setSelected(c);
+                          navigate(`/update-warehouse/${c.slug}`)
                         }}
                       >
                         Edit

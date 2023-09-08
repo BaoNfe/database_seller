@@ -4,6 +4,7 @@ import {
   createWareHouseController,
   deleteWarehouseController,
   updateWareHouseController,
+  getSingleWareHouse,
 } from "../controller/warehouseController.js";
 import formidable from 'express-formidable';
 const router = express.Router();
@@ -17,7 +18,7 @@ router.post(
 
 // Update Warehouse by name
 router.put(
-  "/update-warehouse/:name",
+  "/update-warehouse/:slug",
   formidable(),
   updateWareHouseController
 );
@@ -25,6 +26,8 @@ router.put(
 // Get all Warehouses
 router.get("/get-warehouse", getWareHousesController); // /get-warehouses
 
+//get single warehouse
+router.get("/get-warehouse/:slug", getSingleWareHouse)
 
 // Delete Warehouse by Name
 router.delete("/delete-warehouse/:name", deleteWarehouseController); // /delete-warehouse

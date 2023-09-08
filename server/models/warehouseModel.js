@@ -7,6 +7,10 @@ const warehouseModel = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    slug: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     province: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -30,8 +34,15 @@ const warehouseModel = (sequelize) => {
     totalAreaVolume: {
       type: DataTypes.NUMERIC,
       allowNull: false,
+    },    
+    availableAreaVolume: {
+      type: DataTypes.NUMERIC,
     },
   });
+  Warehouse.prototype.isEmpty = async function () {
+    const productsCount = await this.countProducts();
+    return productsCount === 0;
+  };
   return Warehouse;
 };
 export default warehouseModel;

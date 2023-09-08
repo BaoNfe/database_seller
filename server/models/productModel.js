@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import CategoryModel from './categoryModel.js';
+import warehouseModel from './warehouseModel.js';
 const ProductModel = (sequelize) => {
   const Product = sequelize.define('Product', {
     name: {
@@ -26,12 +27,21 @@ const ProductModel = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    volume: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    warehouse: {
+      type: DataTypes.STRING,
+
+    },
     photo: {
       type: DataTypes.BLOB('long'),
       allowNull: true, 
     },
   });
   const Category = CategoryModel(sequelize);
+  const Warehouse = warehouseModel(sequelize)
 
   Product.associate = (models) => {
     Product.belongsTo(Category, {
@@ -39,7 +49,12 @@ const ProductModel = (sequelize) => {
       onDelete: 'CASCADE',
     });
   };
-
+  Product.associate = (models) => {
+    Product.belongsTo(Warehouse, {
+      foreignKey: 'warehouse',
+      onDelete: 'CASCADE'
+    });
+  };
   return Product;
 };
 
