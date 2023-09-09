@@ -84,7 +84,7 @@ export const getProductController = async (req, res) => {
 
     // Create a modified products array with base64 photo data
     const productsWithPhoto = products.map((product) => {
-      const { id, slug, name, description, price, category_id, quantity, createdAt, updatedAt, photo } = product;
+      const { id, slug, name, description, price,volume, category_id, quantity, createdAt, updatedAt, photo } = product;
 
       // Check if the photo field exists and is not null
       const photoDataUri = photo ? `data:image/jpeg;base64,${photo.toString("base64")}` : null;
@@ -97,6 +97,7 @@ export const getProductController = async (req, res) => {
         price,
         category_id,
         quantity,
+        volume,
         createdAt,
         updatedAt,
         photo: photoDataUri,
@@ -507,7 +508,7 @@ export const moveProductController = async (req, res) => {
       // Update the availableVolume of the original warehouse (subtract the volume to move)
       await Warehouse.update(
         {
-          availableAreaVolume: sequelize.literal(`availableAreaVolume - ${volumeToMove}`),
+          availableAreaVolume: sequelize.literal(`availableAreaVolume + ${volumeToMove}`),
         },
         {
           where: { name: currentWarehouseName },
@@ -518,7 +519,7 @@ export const moveProductController = async (req, res) => {
       // Update the availableVolume of the new warehouse (add the volume to move)
       await Warehouse.update(
         {
-          availableAreaVolume: sequelize.literal(`availableAreaVolume + ${volumeToMove}`),
+          availableAreaVolume: sequelize.literal(`availableAreaVolume - ${volumeToMove}`),
         },
         {
           where: { name: newWarehouseName },
@@ -541,7 +542,114 @@ export const moveProductController = async (req, res) => {
   }
 };
 
-export const cartItemsController = async
+// export const cartItemsController = (req, res) => {
+//   try {
+//     // Retrieve cart items from local storage
+//     const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+
+//     // Send the cart items to the client
+//     res.status(200).send({
+//       success: true,
+//       cartItems,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).send({
+//       success: false,
+//       message: "Error while retrieving cart items",
+//       error: error.message,
+//     });
+//   }
+// };
+
+export const updatedCartItems = async (req, res) => {
+  const { cart } = req.body;
+
+  try {
+    // Start a Sequelize transaction
+    await sequelize.transaction(async (t) => {
+      // Iterate through the cart items and update the server's database
+      for (const cartItem of cart) {
+        const { id, amount } = cartItem;
+
+        // Find the product by its ID in the database and lock it for the transaction
+        const product = await Product.findByPk(id, { transaction: t, lock: t.LOCK.UPDATE });
+
+        // Check if there is enough quantity available in the database
+        if (product.quantity < amount) {
+          return res.status(400).json({ success: false, message: 'Insufficient product quantity' });
+        }
+
+        // Deduct the specified quantity from the product's quantity
+        // product.quantity -= amount;
+        // await product.save({ transaction: t });
+      }
+    });
+
+    // Respond with a success message
+    res.status(200).json({ success: true, message: 'Cart updated successfully' });
+  } catch (error) {
+    console.error('Error updating cart:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const removeCartItems = async (req, res) => {
+  const { cart } = req.body;
+
+  try {
+    // Start a Sequelize transaction
+    await sequelize.transaction(async (t) => {
+      // Iterate through the cart items and update the server's database
+      for (const cartItem of cart) {
+        const { id, amount } = cartItem;
+
+        // Find the product by its ID in the database and lock it for the transaction
+        const product = await Product.findByPk(id, { transaction: t, lock: t.LOCK.UPDATE });
+
+        // Add the specified quantity back to the product's quantity
+        // product.quantity += amount;
+        // await product.save({ transaction: t });
+      }
+    });
+
+    // Respond with a success message
+    res.status(200).json({ success: true, message: 'Cart items removed successfully' });
+  } catch (error) {
+    console.error('Error removing cart items:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const OrderAccept = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Start a Sequelize transaction
+    await sequelize.transaction(async (t) => {
+      // Update the order status to 'Accept' in the database
+      await Order.update(
+        { status: 'Accept' },
+        {
+          where: {
+            id: id,
+          },
+          transaction: t,
+        }
+      );
+
+      // The trigger and stored procedure will handle updating product quantities
+      // There is no need to manually update product quantities here
+
+      // Respond with a success message
+      res.status(200).json({ success: true, message: 'Order accepted successfully' });
+    });
+  } catch (error) {
+    console.error('Error accepting order:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
 
 //get product by category
 export const productCategoryController = async (req, res) => {

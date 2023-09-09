@@ -7,6 +7,7 @@ import UpdateProduct from "./pages/Admin/UpdateProduct.js";
 import HomePage from "./pages/HomePage.js";
 import Products from "./pages/Admin/Products.js";
 import AdminMenu from "./Layout/AdminMenu.js";
+import OrderPage from "./pages/OrderPage.js";
 import UpdateWareHouse from "./pages/Admin/UpdateWarehouse.js";
 import CartPage from "./pages/CartPage.js";
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<Products />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/place-order/:id" element={<OrderPage />} />
           <Route path="/create-warehouse" element={<CreateWarehouse />} />
           <Route path="/create-product" element={<CreateProduct />} />
           <Route path="/create-category" element={<CreateCategory />} />

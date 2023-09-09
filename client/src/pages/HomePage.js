@@ -225,6 +225,7 @@ const HomePage = () => {
   const [products, setProducts] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [cartDataForServer, setCartDataForServer] = useState([]); // State to store cart data for server
 
   // Get products
   const getAllProducts = async () => {
@@ -233,41 +234,54 @@ const HomePage = () => {
       setProducts(data?.products);
     } catch (error) {
       console.log(error);
-      toast.error("Someething Went Wrong");
+      toast.error("Something Went Wrong");
     }
   };
 
-  //lifecycle method
+  // Lifecycle method
   useEffect(() => {
     getAllProducts();
   }, []);
 
-  const handleCartClick = () => {
-    // Navigate to the cart page when the cart button is clicked
+  const handleCartClick = async () => {
+    // Send the cart data to the server when the cart is clicked
+    try {
+      await axios.post("/api/v1/product/update-cart", {
+        cart: cartDataForServer, // Send the cart data to the server
+      });
+    } catch (error) {
+      console.error("Error updating cart on the server:", error);
+      // Handle the error accordingly
+    }
+
     navigate("/cart");
   };
 
   const addToCart = (product) => {
     const existingItem = cart.find((item) => item.id === product.id);
-  
+
     if (existingItem) {
-      // If the item already exists in the cart, update its amount
+      // If the item already exists in the cart, update its amount in the client-side state
       const updatedCart = cart.map((item) =>
-        item.id === product.id ? { ...item, amount: item.amount + 1 } : item
+        item.id === product.id
+          ? { ...item, amount: item.amount + 1 } // Increment the amount
+          : item
       );
       setCart(updatedCart);
       localStorage.setItem("cart", JSON.stringify(updatedCart));
       toast.success("Item amount updated in cart");
     } else {
-      // If the item is not in the cart, add it with an amount of 1
-      setCart([...cart, { ...product, amount: 1 }]);
-      localStorage.setItem(
-        "cart",
-        JSON.stringify([...cart, { ...product, amount: 1 }])
-      );
+      // If the item is not in the cart, add it with an initial amount of 1
+      const newItem = { ...product, amount: 1 };
+      setCart([...cart, newItem]);
+      localStorage.setItem("cart", JSON.stringify([...cart, newItem]));
       toast.success("Item added to cart");
     }
+
+    // Update the cart data for the server
+    setCartDataForServer([...cart, { id: product.id, amount: product.amount || 1 }]);
   };
+
   return (
     <div>
       <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top">
@@ -346,8 +360,8 @@ const HomePage = () => {
         </div>
       </div>
     </div>
-
   );
 };
 
-export default HomePage; 
+export default HomePage;
+

@@ -35,33 +35,58 @@ const CartPage = () => {
     }
   };
 
-  // Remove item from cart
-  const removeCartItem = (productId) => {
-    try {
-      let myCart = [...cart];
-      let index = myCart.findIndex((item) => item._id === productId);
-      myCart.splice(index, 1);
+// Remove item from cart
+const removeCartItem = async (productId) => {
+  try {
+    let myCart = [...cart];
+    let index = myCart.findIndex((item) => item._id === productId);
+    if (index !== -1) {
+      const removedItem = myCart.splice(index, 1)[0];
+      
+      // Send the removed item to the server to update the quantity
+      await axios.post("/api/v1/product/remove-cart", {
+        cart: [removedItem], // Send the removed item as an array
+      });
+
       setCart(myCart);
       localStorage.setItem("cart", JSON.stringify(myCart));
-    } catch (error) {
-      console.log(error);
     }
-  };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+
 
   // Handle payments
   const handlePayment = async () => {
     try {
-      setLoading(true);
-      setLoading(false);
-      localStorage.removeItem("cart");
-      setCart([]);
-      navigate("/orders");
-      toast.success("Payment Completed Successfully");
+      const requestData = cart.map((item) => ({
+        name: item.name,
+        description: item.description,
+        price: parseFloat(item.price),
+        amount: parseFloat(item.amount),
+        volume: parseFloat(item.volume),
+      }));  
+  
+      // Send the cart data to the server's /place-order endpoint
+      const response = await axios.post("/api/v1/order/place-order", { cart: requestData });
+  
+      if (response.status === 201) {
+        // Order was successfully placed, navigate to the orders page or handle success as needed
+        navigate(`/place-order/${response.data.order.id}`);
+      } else {
+        // Handle other responses or errors as needed
+        console.error("Failed to place the order:", response.data.message);
+      }
     } catch (error) {
-      console.log(error);
+      console.error("An error occurred while placing the order:", error);
       setLoading(false);
     }
   };
+  
+  
 
   // Fetch cart items from local storage when the component mounts
   useEffect(() => {
@@ -99,6 +124,7 @@ const CartPage = () => {
                   <p>{product.name}</p>
                   <p>{product.description.substring(0, 30)}</p>
                   <p>Price: {product.price}</p>
+                  <p>Amount: {product.amount}</p>
                 </div>
                 <div className="col-md-4 cart-remove-btn">
                   <button
@@ -122,7 +148,7 @@ const CartPage = () => {
                 onClick={handlePayment}
                 disabled={loading || !cart?.length}
               >
-                {loading ? "Processing ...." : "Make Payment"}
+                Place order
               </button>
             </div>
           </div>

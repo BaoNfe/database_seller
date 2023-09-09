@@ -12,7 +12,10 @@ import {
   searchProductController,
   relatedProductController,
   productCategoryController,
-  moveProductController
+  moveProductController,
+  updatedCartItems,
+  removeCartItems,
+
 } from "../controller/productController.js";
 
 import formidable from "express-formidable";
@@ -63,4 +66,10 @@ router.get("/related-product/:pid/:cid", relatedProductController);
 router.get("/product-category/:slug", productCategoryController);
 
 router.post("/move-product", moveProductController);
+
+//router.get("/cart", cartItemsController)
+
+router.post("/update-cart", updatedCartItems)
+
+router.post("/remove-cart", removeCartItems)
 export default router;

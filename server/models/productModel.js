@@ -55,6 +55,13 @@ const ProductModel = (sequelize) => {
       onDelete: 'CASCADE'
     });
   };
+
+  Product.associate = (models) => {
+    Product.belongsToMany(models.Order, {
+      through: 'OrderItem', 
+      foreignKey: 'productId',
+    });
+  };
   return Product;
 };
 

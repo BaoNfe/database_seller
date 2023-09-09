@@ -2,21 +2,26 @@ import { DataTypes } from 'sequelize';
 
 const orderModel = (sequelize) => {
   const Order = sequelize.define('Order', {
+
     status: {
       type: DataTypes.STRING,
       defaultValue: 'Not Process',
       allowNull: false,
       validate: {
-        isIn: [['Not Process', 'Processing', 'Shipped', 'delivered', 'cancel']],
+        isIn: [['Not Process', 'accept', 'reject']],
       },
     },
+
   }, {
     timestamps: true,
   });
 
-  // Define the association with the Product and User models if needed
-  // Example:
-  // Order.belongsTo(User, { foreignKey: 'buyerId' });
+  // Order.associate = (models) => {
+  //   Order.belongsToMany(models.Product, {
+  //     through: 'OrderItem', 
+  //     foreignKey: 'orderId',
+  //   });
+  // };
 
   return Order;
 };

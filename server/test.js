@@ -7,6 +7,7 @@ import db from "./models/index.js";
 import warehouseRoutes from './routes/warehouseRoute.js';
 import categoryRoutes from './routes/categoryRoute.js'
 import productRoutes from './routes/productRoute.js'
+import orderRoute from './routes/orderRoute.js'
 
 // Configure environment variables
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(morgan('dev'));
 app.use("/api/v1/category", categoryRoutes);
 app.use('/api/v1/warehouse', warehouseRoutes);
 app.use("/api/v1/product", productRoutes);
+app.use("/api/v1/order", orderRoute)
 
 // REST API
 app.get('/', (req, res) => {
