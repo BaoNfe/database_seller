@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
-import AdminMenu from "../../Layout/AdminMenu.js";
+import SellerMenu from "../../components/Layout/SellerMenu";
 import { useNavigate } from "react-router-dom";
 
 const CreateWarehouse = () => {
@@ -102,7 +102,7 @@ const CreateWarehouse = () => {
     <div className="container-fluid m-3 p-3 dashboard">
       <div className="row">
         <div className="col-md-3">
-          <AdminMenu />
+          <SellerMenu />
         </div>
         <div className="col-md-9">
           <h1>Create warehouse</h1>
@@ -196,7 +196,7 @@ const CreateWarehouse = () => {
                         {c.name} <br />
                         {"address: "}
                         {c.province} {c.city} {c.district} {c.street} {c.number} <br />
-                        {"Total volumn: "}{c.totalAreaVolume} {c.availableVolume}
+                        {"Total volumn: "}{c.totalAreaVolume} {c.availableAreaVolume}
                       </div>
                     </td>
                     <td>

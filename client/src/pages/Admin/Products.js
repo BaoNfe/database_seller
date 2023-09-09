@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import AdminMenu from "../../Layout/AdminMenu.js";
+import SellerMenu from "../../components/Layout/SellerMenu";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
@@ -24,7 +24,7 @@ const Products = () => {
   return (
       <div className="row dashboard">
         <div className="col-md-3">
-          <AdminMenu />
+          <SellerMenu />
         </div>
         <div className="col-md-9 ">
           <h1 className="text-center">All Products List</h1>

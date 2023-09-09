@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import AdminMenu from "../../Layout/AdminMenu.js";
+import SellerMenu from "../../components/Layout/SellerMenu";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { Select } from "antd";
@@ -74,7 +74,7 @@ const UpdateWareHouse = () => {
         <div className="container-fluid m-3 p-3 dashboard">
           <div className="row">
             <div className="col-md-3">
-              <AdminMenu />
+              <SellerMenu />
             </div>
             <div className="col-md-9">
               <h1>UPDATE warehouse</h1>

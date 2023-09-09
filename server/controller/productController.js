@@ -4,6 +4,7 @@ import warehouseModel from "../models/warehouseModel.js";
 import slugify from "slugify";
 import fs from 'fs';
 import db from "../models/index.js";
+import { Op } from "sequelize";
 // import { toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 
@@ -303,13 +304,14 @@ export const updateProductController = async (req, res) => {
 export const productFiltersController = async (req, res) => {
   try {
     const { checked, sortPrice, sortCreatedTime } = req.body;
-    let where = {};
+    const filterCriteria = {};
 
     if (checked.length > 0) {
-      where.categoryId = checked;
+      filterCriteria.category_id = { [Op.in]: checked };
     }
 
-    let order = [];
+    // Define the sorting options
+    const sort = [];
 
     if (sortPrice === "asc") {
       order.push(["price", "ASC"]);
@@ -324,20 +326,39 @@ export const productFiltersController = async (req, res) => {
     }
 
     const products = await Product.findAll({
-      where,
-      include: [Category],
+      where: filterCriteria,
       order,
+    });
+    const productsWithPhoto = products.map((product) => {
+      
+      const { id, slug , name, description, price, category_id, quantity, createdAt, updatedAt, photo} = product;
+
+      const photoDataUri = `data:image/jpeg;base64,${photo.toString("base64")}`;
+      return {
+        id,
+        slug,
+        name,
+        description,
+        price,
+        category_id,
+        quantity,
+        createdAt,
+        updatedAt,
+        photo: photoDataUri,
+      };
     });
 
     res.status(200).send({
       success: true,
-      products,
+      countTotal: productsWithPhoto.length,
+      message: "All Products",
+      products: productsWithPhoto,
     });
   } catch (error) {
     console.log(error);
     res.status(400).send({
       success: false,
-      message: "Error while filtering products",
+      message: 'Error while filtering products',
       error: error.message,
     });
   }
@@ -368,15 +389,34 @@ export const productListController = async (req, res) => {
     const offset = (page - 1) * perPage;
 
     const products = await Product.findAll({
-      attributes: { exclude: ['photo'] },
       limit: perPage,
       offset,
       order: [['createdAt', 'DESC']],
     });
+    const productsWithPhoto = products.map((product) => {
+      
+      const { id, slug , name, description, price, category_id, quantity, createdAt, updatedAt, photo} = product;
+
+      const photoDataUri = `data:image/jpeg;base64,${photo.toString("base64")}`;
+      return {
+        id,
+        slug,
+        name,
+        description,
+        price,
+        category_id,
+        quantity,
+        createdAt,
+        updatedAt,
+        photo: photoDataUri,
+      };
+    });
 
     res.status(200).send({
       success: true,
-      products,
+      countTotal: productsWithPhoto.length,
+      message: "All Products",
+      products: productsWithPhoto,
     });
   } catch (error) {
     console.log(error);
@@ -399,10 +439,26 @@ export const searchProductController = async (req, res) => {
           { description: { [Op.like]: `%${keyword}%` } },
         ],
       },
-      attributes: { exclude: ['photo'] },
     });
+    const productsWithPhoto = results.map((product) => {
+      
+      const { id, slug , name, description, price, category_id, quantity, createdAt, updatedAt, photo} = product;
 
-    res.status(200).json(results);
+      const photoDataUri = `data:image/jpeg;base64,${photo.toString("base64")}`;
+      return {
+        id,
+        slug,
+        name,
+        description,
+        price,
+        category_id,
+        quantity,
+        createdAt,
+        updatedAt,
+        photo: photoDataUri,
+      };
+    });  
+    res.status(200).json(productsWithPhoto);
   } catch (error) {
     console.log(error);
     res.status(400).send({
@@ -424,13 +480,13 @@ export const relatedProductController = async (req, res) => {
           [Op.ne]: pid,
         },
       },
-      include: [
-        {
-          model: Category,
-          as: "category",
-        },
-      ],
-      attributes: { exclude: ["photo"] },
+      // include: [
+      //   {
+      //     model: Category,
+      //     as: "category",
+      //   },
+      // ],
+      // attributes: { exclude: ["photo"] },
       limit: 3,
     });
 
@@ -660,18 +716,30 @@ export const productCategoryController = async (req, res) => {
 
     const products = await Product.findAll({
       where: { category_id: category.id },
-      include: [
-        {
-          model: Category,
-          as: "category",
-        },
-      ],
     });
+    const productsWithPhoto = products.map((product) => {
+      
+      const { id, slug , name, description, price, category_id, quantity, createdAt, updatedAt, photo} = product;
+
+      const photoDataUri = `data:image/jpeg;base64,${photo.toString("base64")}`;
+      return {
+        id,
+        slug,
+        name,
+        description,
+        price,
+        category_id,
+        quantity,
+        createdAt,
+        updatedAt,
+        photo: photoDataUri,
+      };
+    });  
 
     res.status(200).send({
       success: true,
       category,
-      products,
+      productsWithPhoto,
     });
   } catch (error) {
     console.log(error);

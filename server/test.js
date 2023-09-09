@@ -8,6 +8,7 @@ import warehouseRoutes from './routes/warehouseRoute.js';
 import categoryRoutes from './routes/categoryRoute.js'
 import productRoutes from './routes/productRoute.js'
 import orderRoute from './routes/orderRoute.js'
+import userRoute from './routes/authRoutes_MySQL.js'
 
 // Configure environment variables
 dotenv.config();
@@ -25,6 +26,7 @@ app.use("/api/v1/category", categoryRoutes);
 app.use('/api/v1/warehouse', warehouseRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/order", orderRoute)
+app.use("/api/v1/auth", userRoute)
 
 // REST API
 app.get('/', (req, res) => {
