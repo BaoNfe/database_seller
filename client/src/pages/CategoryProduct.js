@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout/Layout";
 import { useParams, useNavigate } from "react-router-dom";
 import {toast} from "react-hot-toast";
-import { useCartContext } from "../context/cart";
+import { useCart } from "../context/cart";
 import axios from "axios";
 const CategoryProduct = () => {
   const params = useParams();
@@ -10,7 +10,7 @@ const CategoryProduct = () => {
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState([]);
 
-  const { cart, addToCart } = useCartContext();
+  const { cart, addToCart } = useCart();
 
   useEffect(() => {
     if (params?.slug) getProductsByCat();

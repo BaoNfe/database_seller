@@ -5,7 +5,7 @@ import {
   testController,
   forgotPasswordController,
 } from "../controller/authController_MySQL.js"
-import { isSeller, requireSignIn } from "../middlewares/authMiddleware.js";
+import { isSeller, requireSignIn, isAdmin } from "../middlewares/authMiddleware.js";
 
 //router object
 const router = express.Router();
@@ -30,6 +30,10 @@ router.get("/user-auth", requireSignIn, (req, res) => {
 
 //protected Seller route auth
 router.get("/seller-auth", requireSignIn, isSeller, (req, res) => {
+  res.status(200).send({ ok: true });
+});
+
+router.get("/admin-auth", requireSignIn, isAdmin, (req, res) => {
   res.status(200).send({ ok: true });
 });
 export default router;

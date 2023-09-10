@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout/Layout";
 import axios from "axios";
-import {toast} from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import "../styles/Homepage.css";
 import { Checkbox, Radio } from "antd";
 import { useCart } from "../context/cart";
@@ -19,7 +19,10 @@ const HomePage = () => {
   const [sortPrice, setSortPrice] = useState("asc");
   const [sortCreatedAt, setSortCreatedAt] = useState("asc");
   const [cartDataForServer, setCartDataForServer] = useState([]); // State to store cart data for server
+  const [selectedProperties, setSelectedProperties] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
+  console.log("produuct", products)
 
   const handleSortPrice = (e) => {
     setSortPrice(e.target.value);
@@ -47,58 +50,61 @@ const HomePage = () => {
     getTotal();
   }, []);
 
-    //getTOtal COunt
-    const getTotal = async () => {
-      try {
-        const { data } = await axios.get("/api/v1/product/product-count");
-        setTotal(data?.total);
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  //getTOtal COunt
+  const getTotal = async () => {
+    try {
+      const { data } = await axios.get("/api/v1/product/product-count");
+      setTotal(data?.total);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
 
-    useEffect(() => {
-      if (page === 1) return;
-      loadMore();
-    }, [page]);
-    //load more
-    const loadMore = async () => {
-      try {
-        setLoading(true);
-        const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
-        setLoading(false);
-        setProducts([...products, ...data?.products]);
-      } catch (error) {
-        console.log(error);
-        setLoading(false);
-      }
-    };
+  useEffect(() => {
+    if (page === 1) return;
+    loadMore();
+  }, [page]);
+  //load more
+  const loadMore = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
+      setLoading(false);
+      setProducts([...products, ...data?.products]);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
 
 
-      // filter by cat
+  // filter by cat
   const handleFilter = (value, id) => {
     let all = [...checked];
     if (value) {
       all.push(id);
     } else {
       all = all.filter((c) => c !== id);
+      setSelectedProperties([]);
     }
     setChecked(all);
+    setSelectedCategory(value ? id : "");
   };
   useEffect(() => {
     if (!checked.length) getAllProducts();
   }, [checked.length]);
 
   useEffect(() => {
-    if (checked.length|| sortPrice.length || sortCreatedAt.length) filterProduct();
-  }, [checked, sortPrice, sortCreatedAt]);
+    if (checked.length || sortPrice.length || sortCreatedAt.length || selectedProperties.length) filterProduct();
+  }, [checked, selectedProperties, sortPrice, sortCreatedAt]);
 
   //get filterd product
   const filterProduct = async () => {
     try {
       const { data } = await axios.post("/api/v1/product/product-filters", {
         checked,
+        selectedProperties,
         sortPrice,
         sortCreatedAt,
       });
@@ -113,7 +119,7 @@ const HomePage = () => {
     try {
       setLoading(true);
       const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
-      console.log("hererdata",data)
+      console.log("hererdata", data)
       setLoading(false);
       setProducts(data?.products);
     } catch (error) {
@@ -161,22 +167,62 @@ const HomePage = () => {
     // Update the cart data for the server
     setCartDataForServer([...cart, { id: product.id, amount: product.amount || 1 }]);
   };
-  console.log(products, categories)
+
+  const getPropertiesForCategory = (categoryName) => {
+    const selectedCategory = categories.find((c) => c.name === categoryName);
+    return selectedCategory ? selectedCategory.properties : [];
+  };
+
+  const handlePropertyValueSelect = (property) => {
+    // Check if the property is already selected
+    const isSelected = selectedProperties.includes(property);
+  
+    // If it's selected and you want to unselect it, filter it out
+    if (isSelected) {
+      setSelectedProperties(selectedProperties.filter((p) => p !== property));
+    } else {
+      // If it's not selected, add it to the selected properties
+      setSelectedProperties([...selectedProperties, property]);
+    }
+  };
+
+
+  console.log(checked, selectedProperties)
   return (
     <Layout title={"ALl Products - Best offers "}>
-    <div className="container-fluid row mt-3">
+      <div className="container-fluid row mt-3">
         <div className="col-md-2">
           <h4 className="text-center">Filter By Category</h4>
           <div className="d-flex flex-column">
             {categories?.map((c) => (
-              <Checkbox
-                key={c.id}
-                onChange={(e) => handleFilter(e.target.checked, c.name)}
-              >
-                {c.name}
-              </Checkbox>
-            ))} 
+              <div key={c.id}>
+                <Checkbox
+                  onChange={(e) => handleFilter(e.target.checked, c.name)}
+                >
+                  {c.name}
+                </Checkbox>
+                {selectedCategory === c.name && (
+                  <div className="m-3">
+                    {getPropertiesForCategory(selectedCategory).map(
+                      (property) => (
+                        <Checkbox
+                          key={property.name}
+                          onChange={() =>
+                            handlePropertyValueSelect(property.name)
+                          }
+                          checked={selectedProperties.includes(property.name)}
+                        >
+                          {property.name}
+                        </Checkbox>
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+
           </div>
+
           {/* price filter */}
           <h4 className="text-center mt-4">Sort By Price:</h4>
           <div className="d-flex flex-column">
@@ -191,7 +237,7 @@ const HomePage = () => {
               <Radio.Button value="asc">Ascending</Radio.Button>
               <Radio.Button value="desc">Descending</Radio.Button>
             </Radio.Group>
-            </div>  
+          </div>
 
 
           <div className="d-flex flex-column">
@@ -203,48 +249,48 @@ const HomePage = () => {
             </button>
           </div>
         </div>
-      <div className="container-fluid row mt-3 home-page">
-        <div className="col-md-12">
-          <h1 className="text-center">All Products</h1>
-        </div>
-        <div className="col-md-12 d-flex flex-wrap">
-          {products?.map((p) => (
-            <div className="card m-2" key={p.id}>
-              <img
-                src={`/api/v1/product/product-photo/${p.id}`}
-                className="card-img-top"
-                alt={p.name}
-              />
-              <div className="card-body">
-                <div className="card-name-price">
-                  <h5 className="card-title">{p.name}</h5>
-                  <h5 className="card-title card-price">
-                    {p.price.toLocaleString("en-US", {
-                      style: "currency",
-                      currency: "USD",
-                    })}
-                  </h5>
-                </div>
-                <p className="card-text">
-                  {p.description.substring(0, 60)}...
-                </p>
-                <div className="card-name-price">
-                  <button
-                    className="btn btn-info ms-1"
-                    onClick={() => navigate(`/product/${p.slug}`)}
-                  >
-                    More Details
-                  </button>
-                  <button className="btn btn-secondary ms-1"
-                  onClick={() => addToCart(p)}>
-                    ADD TO CART
-                  </button>
+        <div className="col-md-9 offset-1">
+          <div className="col-md-12">
+            <h1 className="text-center">All Products</h1>
+          </div>
+          <div className="col-md-12 d-flex flex-wrap">
+            {products?.map((p) => (
+              <div className="card m-2" key={p.id}>
+                <img
+                  src={`/api/v1/product/product-photo/${p.id}`}
+                  className="card-img-top"
+                  alt={p.name}
+                />
+                <div className="card-body">
+                  <div className="card-name-price">
+                    <h5 className="card-title">{p.name}</h5>
+                    <h5 className="card-title card-price">
+                      {p.price.toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      })}
+                    </h5>
+                  </div>
+                  <p className="card-text">
+                    {p.description.substring(0, 60)}...
+                  </p>
+                  <div className="card-name-price">
+                    <button
+                      className="btn btn-info ms-1"
+                      onClick={() => navigate(`/product/${p.slug}`)}
+                    >
+                      More Details
+                    </button>
+                    <button className="btn btn-secondary ms-1"
+                      onClick={() => addToCart(p)}>
+                      ADD TO CART
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-                  <div className="m-2 p-3">
+            ))}
+          </div>
+          <div className="m-2 p-3">
             {products && products.length < total && (
               <button
                 className="btn btn-warning"
@@ -257,8 +303,8 @@ const HomePage = () => {
               </button>
             )}
           </div>
+        </div>
       </div>
-    </div>    
     </Layout>
   );
 };

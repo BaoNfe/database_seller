@@ -11,15 +11,31 @@ export const syncData = async () => {
   try {
     // Fetch data from MongoDB
     const mongoData = await Categories.find(); // Replace with your MongoDB model
+    console.log(mongoData);
+
+    // Fetch parent data from MongoDB
+    const parentData = await Categories.find({ _id: { $in: mongoData.map(item => item.parent) } });
+
+    // Create a map for fast look-up of parent names by ObjectId
+    const parentNameMap = {};
+    parentData.forEach(parent => {
+      parentNameMap[parent._id.toString()] = parent.name;
+    });
+    
+    const transformData= mongoData.map((item) => ({
+      name: item.name, // Map MongoDB fields to MySQL fields
+      slug: item.name,
+      parent: item.parent ? parentNameMap[item.parent.toString()] : null, // Use parent name
+      properties: item.properties.map((property) => ({
+        name: property.name,
+        values: property.values,
+      })),
+    }))
 
     // Synchronize MongoDB data to MySQL
     await Category.bulkCreate(
-      mongoData.map((item) => ({
-        name: item.name, // Map MongoDB fields to MySQL fields
-        slug: item.name,
-        parent: item.parent ? item.parent.toString() : null,
-      })),
-      { updateOnDuplicate: ["name", "slug", "parent"] }
+      transformData,
+      { updateOnDuplicate: ["name", "slug", "parent", "properties"] }
     ); // Update existing records by name and slug
 
     console.log("Data synchronized successfully.");

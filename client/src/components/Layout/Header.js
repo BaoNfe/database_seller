@@ -3,14 +3,14 @@ import { NavLink, Link, useNavigate } from "react-router-dom";
 import SearchInput from "../Form/SearchInput";
 import useCategory from "../../hooks/useCategory";
 import toast from "react-hot-toast";
-import { useCartContext } from "../../context/cart";
+import { useCart, CartProvider } from "../../context/cart";
 import { Badge } from "antd";
 import { useAuth } from "../../context/auth";
 import axios from "axios";
 const Header = () => {
   const [auth, setAuth] = useAuth();
   const navigate = useNavigate();
-  const { cart } = useCartContext();
+  const { cart } = useCart();
 
   const handleLogout = () => {
     setAuth({
@@ -34,9 +34,9 @@ const Header = () => {
     }
 
     navigate("/cart");
-    
-  };
 
+  };
+  console.log(cart.length)
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -119,6 +119,15 @@ const Header = () => {
                     <ul className="dropdown-menu">
                       <li>
                         <NavLink
+                          to={`/dashboard/${auth?.user?.role === 0 ? "admin" : auth?.user?.role === 1 ? "seller" : "user"
+                            }`}
+                          className="dropdown-item"
+                        >
+                          Dashboard
+                        </NavLink>
+                      </li>
+                      <li>
+                        <NavLink
                           onClick={handleLogout}
                           to="/login"
                           className="dropdown-item"
@@ -133,7 +142,7 @@ const Header = () => {
 
               <li className="nav-item">
                 <Badge count={cart?.length} showZero>
-                  <NavLink onClick={() => handleCartClick()}>
+                  <NavLink className="nav-link" onClick={() => handleCartClick()}>
                     Cart
                   </NavLink>
                 </Badge>

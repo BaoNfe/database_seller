@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import SellerMenu from "../../components/Layout/SellerMenu";
+import Layout from "../../components/Layout/Layout";
 import CategoryForm from "../../components/Form/CategoryForm.js";
 import { Modal } from "antd";
 const CreateCategory = () => {
@@ -85,7 +86,7 @@ const CreateCategory = () => {
     }
   };
   return (
-
+<Layout>
       <div className="container-fluid m-3 p-3 dashboard">
         <div className="row">
           <div className="col-md-3">
@@ -153,6 +154,7 @@ const CreateCategory = () => {
           </div>
         </div>
       </div>
+      </Layout>
   );
 };
 

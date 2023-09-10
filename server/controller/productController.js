@@ -4,7 +4,7 @@ import warehouseModel from "../models/warehouseModel.js";
 import slugify from "slugify";
 import fs from "fs";
 import db from "../models/index.js";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 // import { toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 
@@ -18,10 +18,9 @@ const callUpdateProductWarehouse = async (productName, productQuantity) => {
     replacements: [productName, productQuantity],
   });
 };
-
 export const createProductController = async (req, res) => {
   try {
-    const { name, description, price, category_id, quantity, volume } =
+    const { name, description, price, category_id, quantity, volume, properties } =
       req.fields;
     const { photo } = req.files;
 
@@ -57,14 +56,15 @@ export const createProductController = async (req, res) => {
       category_id,
       quantity,
       volume,
+      properties,
       slug: slugify(name),
     });
-
+    await callUpdateProductWarehouse(name, quantity);
     if (photo) {
       const photoData = fs.readFileSync(photo.path);
       await product.update({ photo: photoData });
     }
-    await callUpdateProductWarehouse(name, quantity);
+
     res.status(201).send({
       success: true,
       message: "Product Created Successfully",
@@ -95,6 +95,7 @@ export const getProductController = async (req, res) => {
         volume,
         category_id,
         quantity,
+        properties,
         createdAt,
         updatedAt,
         photo,
@@ -114,6 +115,7 @@ export const getProductController = async (req, res) => {
         category_id,
         quantity,
         volume,
+        properties,
         createdAt,
         updatedAt,
         photo: photoDataUri,
@@ -320,13 +322,16 @@ export const updateProductController = async (req, res) => {
 // filters
 export const productFiltersController = async (req, res) => {
   try {
-    const { checked, sortPrice, sortCreatedAt } = req.body;
+    const { checked, selectedProperties, sortPrice, sortCreatedAt } = req.body;
     const filterCriteria = {};
 
     if (checked.length > 0) {
       filterCriteria.category_id = { [Op.in]: checked };
     }
-
+    
+    if (selectedProperties.length > 0) {
+      filterCriteria.properties = { [Op.in]: selectedProperties };
+    }
     // Define the sorting options
     const sort = [];
 
@@ -342,10 +347,12 @@ export const productFiltersController = async (req, res) => {
       sort.push(["createdAt", "DESC"]);
     }
 
+    console.log("uasd", filterCriteria)
     const products = await Product.findAll({
       where: filterCriteria,
       order: sort,
     });
+    console.log(products)
     const productsWithPhoto = products.map((product) => {
       const {
         id,
@@ -356,6 +363,7 @@ export const productFiltersController = async (req, res) => {
         category_id,
         quantity,
         volume,
+        properties,
         createdAt,
         updatedAt,
         photo,
@@ -372,6 +380,7 @@ export const productFiltersController = async (req, res) => {
         category_id,
         quantity,
         volume,
+        properties,
         createdAt,
         updatedAt,
         photo: photoDataUri,
@@ -433,6 +442,7 @@ export const productListController = async (req, res) => {
         category_id,
         quantity,
         volume,
+        properties,
         createdAt,
         updatedAt,
         photo,
@@ -448,6 +458,7 @@ export const productListController = async (req, res) => {
         category_id,
         quantity,
         volume,
+        properties,
         createdAt,
         updatedAt,
         photo: photoDataUri,
@@ -492,6 +503,7 @@ export const searchProductController = async (req, res) => {
         category_id,
         quantity,
         volume,
+        properties,
         createdAt,
         updatedAt,
         photo,
@@ -507,6 +519,7 @@ export const searchProductController = async (req, res) => {
         category_id,
         quantity,
         volume,
+        properties,
         createdAt,
         updatedAt,
         photo: photoDataUri,
@@ -599,7 +612,7 @@ export const moveProductController = async (req, res) => {
     }
 
     // Perform the move within a transaction
-    await sequelize.transaction(async (t) => {
+    await sequelize.transaction({ isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.READ_COMMITTED }, async (t) => {
       // Decrease the quantity in the current warehouse
       await Product.decrement("quantity", {
         by: product.quantity,
@@ -683,7 +696,7 @@ export const updatedCartItems = async (req, res) => {
 
   try {
     // Start a Sequelize transaction
-    await sequelize.transaction(async (t) => {
+    await sequelize.transaction({ isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.READ_COMMITTED }, async (t) => {
       // Iterate through the cart items and update the server's database
       for (const cartItem of cart) {
         const { id, amount } = cartItem;
@@ -722,7 +735,7 @@ export const removeCartItems = async (req, res) => {
 
   try {
     // Start a Sequelize transaction
-    await sequelize.transaction(async (t) => {
+    await sequelize.transaction({ isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.READ_COMMITTED }, async (t) => {
       // Iterate through the cart items and update the server's database
       for (const cartItem of cart) {
         const { id, amount } = cartItem;
@@ -754,7 +767,7 @@ export const OrderAccept = async (req, res) => {
 
   try {
     // Start a Sequelize transaction
-    await sequelize.transaction(async (t) => {
+    await sequelize.transaction({ isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.READ_COMMITTED }, async (t) => {
       // Update the order status to 'Accept' in the database
       await Order.update(
         { status: "Accept" },
@@ -800,6 +813,7 @@ export const productCategoryController = async (req, res) => {
         category_id,
         quantity,
         volume,
+        properties,
         createdAt,
         updatedAt,
         photo,
@@ -815,6 +829,7 @@ export const productCategoryController = async (req, res) => {
         category_id,
         quantity,
         volume,
+        properties,
         createdAt,
         updatedAt,
         photo: photoDataUri,

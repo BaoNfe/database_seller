@@ -12,7 +12,11 @@ const CategoryModel = (sequelize) => {
       allowNull: true,
     },
     parent: {
-      type: DataTypes.UUID,
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    properties: {
+      type: DataTypes.JSON, // Use DataTypes.JSON for storing JSON data
       allowNull: true,
     },
   });

@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import CategoryModel from './categoryModel.js';
 import warehouseModel from './warehouseModel.js';
+
 const ProductModel = (sequelize) => {
   const Product = sequelize.define('Product', {
     name: {
@@ -33,35 +34,37 @@ const ProductModel = (sequelize) => {
     },
     warehouse: {
       type: DataTypes.STRING,
-
+      defaultValue: 'null',
     },
     photo: {
       type: DataTypes.BLOB('long'),
-      allowNull: true, 
+      allowNull: true,
+    },
+    // New field to store properties and their values as JSON
+    properties: {
+      type: DataTypes.STRING, // You can also use DataTypes.JSONB for binary JSON
+      allowNull: true, // Set to true if some products may not have properties
     },
   });
+
   const Category = CategoryModel(sequelize);
-  const Warehouse = warehouseModel(sequelize)
+  const Warehouse = warehouseModel(sequelize);
 
   Product.associate = (models) => {
     Product.belongsTo(Category, {
       foreignKey: 'category_id',
       onDelete: 'CASCADE',
     });
-  };
-  Product.associate = (models) => {
     Product.belongsTo(Warehouse, {
       foreignKey: 'warehouse',
-      onDelete: 'CASCADE'
+      onDelete: 'CASCADE',
     });
-  };
-
-  Product.associate = (models) => {
     Product.belongsToMany(models.Order, {
-      through: 'OrderItem', 
+      through: 'OrderItem',
       foreignKey: 'productId',
     });
   };
+
   return Product;
 };
 

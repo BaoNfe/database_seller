@@ -22,6 +22,9 @@ import Category from "./pages/Categories.js";
 import Search from "./pages/Search.js"
 import CategoryProduct from "./pages/CategoryProduct.js";
 import Pagenotfound from "./pages/Pagenotfound.js"
+import AdminRoute from "./components/Routes/AdminRoute.js"
+import AdminDashboard from "./pages/Admin/AdminDashboard.js";
+import ProductsAdmin from "./pages/Admin/ProductsAdmin.js"
 function App() {
   return (
     <>
@@ -39,7 +42,11 @@ function App() {
         <Route path="seller/products" element={<Products />} />
         <Route path="seller/users" element={<Users />} />
       </Route>
-        
+      <Route path="/dashboard" element={<AdminRoute />}>
+        <Route path="admin" element={<AdminDashboard />} />
+        <Route path="admin/products" element={<ProductsAdmin />} />
+        <Route path="admin/create-warehouse" element={<CreateWarehouse />} />
+      </Route>
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />

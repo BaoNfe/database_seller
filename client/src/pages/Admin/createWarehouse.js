@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import SellerMenu from "../../components/Layout/SellerMenu";
+import Layout from "../../components/Layout/Layout";
 import { useNavigate } from "react-router-dom";
 
 const CreateWarehouse = () => {
@@ -99,6 +100,7 @@ const CreateWarehouse = () => {
   };
 
   return (
+    <Layout>
     <div className="container-fluid m-3 p-3 dashboard">
       <div className="row">
         <div className="col-md-3">
@@ -218,6 +220,7 @@ const CreateWarehouse = () => {
         </div>
       </div>
     </div>
+    </Layout>
   );
 };
 

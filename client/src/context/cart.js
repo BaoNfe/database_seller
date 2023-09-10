@@ -1,30 +1,31 @@
 // CartContext.js
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import toast from "react-hot-toast";
 
 const CartContext = createContext();
 
-export const useCartContext = () => {
-  return useContext(CartContext);
-};
-
-export const CartProvider = ({ children }) => {
+const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [cartDataForServer, setCartDataForServer] = useState([]);
 
-  const addToCart = (product) => {
-    const existingItem = cart.find((item) => item.id === product.id);
+  useEffect(() => {
+    // Load cart data from localStorage when the component mounts
+    let existingCartItem = localStorage.getItem("cart");
+    if (existingCartItem) setCart(JSON.parse(existingCartItem));
+  }, []);
 
-    if (existingItem) {
-      const updatedCart = cart.map((item) =>
-        item.id === product.id
-          ? { ...item, amount: item.amount + 1 }
-          : item
-      );
+  const addToCart = (product) => {
+    const existingItemIndex = cart.findIndex((item) => item.id === product.id);
+
+    if (existingItemIndex !== -1) {
+      // If the item already exists in the cart, update its amount
+      const updatedCart = [...cart];
+      updatedCart[existingItemIndex].amount += 1;
       setCart(updatedCart);
       localStorage.setItem("cart", JSON.stringify(updatedCart));
       toast.success("Item amount updated in cart");
     } else {
+      // If the item doesn't exist, add it to the cart
       const newItem = { ...product, amount: 1 };
       setCart([...cart, newItem]);
       localStorage.setItem("cart", JSON.stringify([...cart, newItem]));
@@ -41,4 +42,6 @@ export const CartProvider = ({ children }) => {
   );
 };
 
+const useCart = () => useContext(CartContext);
 
+export { useCart, CartProvider };

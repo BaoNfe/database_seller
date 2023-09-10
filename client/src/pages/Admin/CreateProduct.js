@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import SellerMenu from "../../components/Layout/SellerMenu";
+import Layout from "../../components/Layout/Layout";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { Select } from "antd";
@@ -17,6 +18,8 @@ const CreateProduct = () => {
   const [volume, setVolume] = useState("");
   const [shipping, setShipping] = useState("");
   const [photo, setPhoto] = useState("");
+  const [selectedProperties, setSelectedProperties] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   //get all category
   const getAllCategory = async () => {
@@ -47,6 +50,7 @@ const CreateProduct = () => {
       productData.append("photo", photo);
       productData.append("category_id", category_id);
       productData.append("volume", volume);
+      productData.append("properties", selectedProperties.join(","));
       const { data } = axios.post(
         "/api/v1/product/create-product",
         productData
@@ -55,15 +59,27 @@ const CreateProduct = () => {
         toast.error(data?.message);
       } else {
         toast.success("Product Created Successfully");
-        navigate("/products");
+        navigate("/dashboard/seller/products");
       }
     } catch (error) {
       console.log(error);
       toast.error("something went wrong");
     }
   };
+  
+  const getPropertiesForCategory = (categoryName) => {
+    const selectedCategory = categories.find((c) => c.name === categoryName);
+    return selectedCategory ? selectedCategory.properties : [];
+  };
+
+  const handlePropertyValueSelect = (value) => {
+    setSelectedProperties([...selectedProperties, value]); // Push the selected value to the array
+  };
+
+  
 
   return (
+    <Layout>
       <div className="container-fluid m-3 p-3 dashboard">
         <div className="row">
           <div className="col-md-3">
@@ -72,13 +88,14 @@ const CreateProduct = () => {
           <div className="col-md-9">
             <h1>Create Product</h1>
             <div className="m-1 w-75">
-              <Select
+             <Select
                 bordered={false}
                 placeholder="Select a category"
                 size="large"
                 showSearch
                 className="form-select mb-3"
                 onChange={(value) => {
+                  setSelectedCategory(value);
                   setCategory(value);
                 }}
               >
@@ -88,6 +105,32 @@ const CreateProduct = () => {
                   </Option>
                 ))}
               </Select>
+              {selectedCategory && (
+                <div className="mb-3">
+                  {getPropertiesForCategory(selectedCategory).map(
+                    (property) => (
+                      <Select
+                        key={property.name}
+                        bordered={false}
+                        placeholder={`Select ${property.name}`}
+                        size="large"
+                        showSearch
+                        className="form-select mb-3"
+                        onChange={(value) => {
+                          handlePropertyValueSelect(property.name, value);
+                        }}
+                        value={selectedProperties[property.name]}
+                      >
+                        {property.values.map((value) => (
+                          <Option key={value} value={value}>
+                            {value}
+                          </Option>
+                        ))}
+                      </Select>
+                    )
+                  )}
+                </div>
+              )}
               <div className="mb-3">
                 <label className="btn btn-outline-secondary col-md-12">
                   {photo ? photo.name : "Upload Photo"}
@@ -182,6 +225,7 @@ const CreateProduct = () => {
           </div>
         </div>
       </div>
+      </Layout>
   );
 };
 

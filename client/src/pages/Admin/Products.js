@@ -3,6 +3,7 @@ import SellerMenu from "../../components/Layout/SellerMenu";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import Layout from "../../components/Layout/Layout";
 const Products = () => {
   const [products, setProducts] = useState([]);
 
@@ -22,6 +23,7 @@ const Products = () => {
     getAllProducts();
   }, []);
   return (
+    <Layout>
       <div className="row dashboard">
         <div className="col-md-3">
           <SellerMenu />
@@ -51,6 +53,7 @@ const Products = () => {
           </div>
         </div>
       </div>
+      </Layout>
   );
 };
 
