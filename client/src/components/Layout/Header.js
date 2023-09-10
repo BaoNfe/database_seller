@@ -1,13 +1,17 @@
-import React from "react";
-import { NavLink, Link } from "react-router-dom";
+import React, { useState } from "react";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import SearchInput from "../Form/SearchInput";
 import useCategory from "../../hooks/useCategory";
 import toast from "react-hot-toast";
-import { useCart } from "../../context/cart";
+import { useCartContext } from "../../context/cart";
 import { Badge } from "antd";
 import { useAuth } from "../../context/auth";
+import axios from "axios";
 const Header = () => {
   const [auth, setAuth] = useAuth();
+  const navigate = useNavigate();
+  const { cart } = useCartContext();
+
   const handleLogout = () => {
     setAuth({
       ...auth,
@@ -18,8 +22,21 @@ const Header = () => {
     toast.success("Logout Successfully");
   };
   const categories = useCategory();
-  const [cart] = useCart();
-  console.log(categories)
+  const handleCartClick = async () => {
+    // Send the cart data to the server when the cart is clicked
+    try {
+      await axios.post("/api/v1/product/update-cart", {
+        cart: cart, // Send the cart data to the server
+      });
+    } catch (error) {
+      console.error("Error updating cart on the server:", error);
+      // Handle the error accordingly
+    }
+
+    navigate("/cart");
+    
+  };
+
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -116,7 +133,7 @@ const Header = () => {
 
               <li className="nav-item">
                 <Badge count={cart?.length} showZero>
-                  <NavLink to="/cart" className="nav-link">
+                  <NavLink onClick={() => handleCartClick()}>
                     Cart
                   </NavLink>
                 </Badge>

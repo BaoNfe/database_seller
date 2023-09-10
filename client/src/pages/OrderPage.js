@@ -61,7 +61,7 @@
   
         if (response.data.success) {
           console.log(`Order Rejected Successfully`);
-          // You can update the UI to reflect the changed order status here
+          navigate("/")
         } else {
           console.error('Failed to accept order');
         }

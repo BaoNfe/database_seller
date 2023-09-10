@@ -20,6 +20,7 @@ import Login from "./pages/Auth/Login.js"
 import ProductDetails from "./pages/ProductDetails.js";
 import Category from "./pages/Categories.js";
 import Search from "./pages/Search.js"
+import CategoryProduct from "./pages/CategoryProduct.js";
 import Pagenotfound from "./pages/Pagenotfound.js"
 function App() {
   return (
@@ -27,7 +28,7 @@ function App() {
       <Routes>
       <Route path="/dashboard" element={<PrivateRoute />}>
         <Route path="user" element={<Dashboard />} />
-        <Route path="user/orders" element={<OrderPage />} />
+
         <Route path="user/profile" element={<Profile />} />
       </Route>
       <Route path="/dashboard" element={<SellerRoute />}>
@@ -43,8 +44,10 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/product/:slug" element={<ProductDetails />} />
-        <Route path="/categories" element={<Category />} />
+        <Route path="/category" element={<Category />} />
+        <Route path="/category/:slug" element={<CategoryProduct />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/place-order/:id" element={<OrderPage />} />
         <Route path="/search" element={<Search />} />
         <Route path="*" element={<Pagenotfound />} />
       </Routes>

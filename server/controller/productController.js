@@ -2,7 +2,7 @@ import CategoryModel from "../models/categoryModel.js";
 import ProductModel from "../models/productModel.js";
 import warehouseModel from "../models/warehouseModel.js";
 import slugify from "slugify";
-import fs from 'fs';
+import fs from "fs";
 import db from "../models/index.js";
 import { Op } from "sequelize";
 // import { toast } from "react-toastify";
@@ -11,17 +11,18 @@ import { Op } from "sequelize";
 const sequelize = db.sequelize;
 const Category = CategoryModel(sequelize);
 const Product = ProductModel(sequelize);
-const Warehouse = warehouseModel(sequelize)
+const Warehouse = warehouseModel(sequelize);
 
 const callUpdateProductWarehouse = async (productName, productQuantity) => {
-  await sequelize.query('CALL UpdateProductWarehouse(?, ?)', {
+  await sequelize.query("CALL UpdateProductWarehouse(?, ?)", {
     replacements: [productName, productQuantity],
   });
 };
 
 export const createProductController = async (req, res) => {
   try {
-    const { name, description, price, category_id, quantity, volume } = req.fields;
+    const { name, description, price, category_id, quantity, volume } =
+      req.fields;
     const { photo } = req.files;
 
     // Validation
@@ -85,10 +86,24 @@ export const getProductController = async (req, res) => {
 
     // Create a modified products array with base64 photo data
     const productsWithPhoto = products.map((product) => {
-      const { id, slug, name, description, price,volume, category_id, quantity, createdAt, updatedAt, photo } = product;
+      const {
+        id,
+        slug,
+        name,
+        description,
+        price,
+        volume,
+        category_id,
+        quantity,
+        createdAt,
+        updatedAt,
+        photo,
+      } = product;
 
       // Check if the photo field exists and is not null
-      const photoDataUri = photo ? `data:image/jpeg;base64,${photo.toString("base64")}` : null;
+      const photoDataUri = photo
+        ? `data:image/jpeg;base64,${photo.toString("base64")}`
+        : null;
 
       return {
         id,
@@ -129,7 +144,9 @@ export const getSingleProductController = async (req, res) => {
 
     if (product && product.photo) {
       // Convert the binary photo data to a Base64 data URI
-      const photoDataUri = `data:image/jpeg;base64,${product.photo.toString("base64")}`;
+      const photoDataUri = `data:image/jpeg;base64,${product.photo.toString(
+        "base64"
+      )}`;
 
       // Create a modified product object with the photo as a data URI
       const productWithPhotoDataUri = {
@@ -177,7 +194,6 @@ export const productPhotoController = async (req, res) => {
 
     // Send the binary image data as-is
     res.end(product.photo);
-
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -213,7 +229,9 @@ export const deleteProductController = async (req, res) => {
     // Update the availableAreaVolume of the current warehouse by adding the volume to delete
     await Warehouse.update(
       {
-        availableAreaVolume: sequelize.literal(`availableAreaVolume + ${volumeToDelete}`),
+        availableAreaVolume: sequelize.literal(
+          `availableAreaVolume + ${volumeToDelete}`
+        ),
       },
       {
         where: { name: currentWarehouseName },
@@ -241,8 +259,7 @@ export const deleteProductController = async (req, res) => {
 //upate product
 export const updateProductController = async (req, res) => {
   try {
-    const { name, description, price, category_id, quantity } =
-      req.fields;
+    const { name, description, price, category_id, quantity } = req.fields;
     const { photo } = req.files;
     // Validation
     switch (true) {
@@ -303,7 +320,7 @@ export const updateProductController = async (req, res) => {
 // filters
 export const productFiltersController = async (req, res) => {
   try {
-    const { checked, sortPrice, sortCreatedTime } = req.body;
+    const { checked, sortPrice, sortCreatedAt } = req.body;
     const filterCriteria = {};
 
     if (checked.length > 0) {
@@ -314,26 +331,38 @@ export const productFiltersController = async (req, res) => {
     const sort = [];
 
     if (sortPrice === "asc") {
-      order.push(["price", "ASC"]);
+      sort.push(["price", "ASC"]);
     } else if (sortPrice === "desc") {
-      order.push(["price", "DESC"]);
+      sort.push(["price", "DESC"]);
     }
 
-    if (sortCreatedTime === "asc") {
-      order.push(["createdTime", "ASC"]);
-    } else if (sortCreatedTime === "desc") {
-      order.push(["createdTime", "DESC"]);
+    if (sortCreatedAt === "asc") {
+      sort.push(["createdAt", "ASC"]);
+    } else if (sortCreatedAt === "desc") {
+      sort.push(["createdAt", "DESC"]);
     }
 
     const products = await Product.findAll({
       where: filterCriteria,
-      order,
+      order: sort,
     });
     const productsWithPhoto = products.map((product) => {
-      
-      const { id, slug , name, description, price, category_id, quantity, createdAt, updatedAt, photo} = product;
+      const {
+        id,
+        slug,
+        name,
+        description,
+        price,
+        category_id,
+        quantity,
+        volume,
+        createdAt,
+        updatedAt,
+        photo,
+      } = product;
 
       const photoDataUri = `data:image/jpeg;base64,${photo.toString("base64")}`;
+      console.log("here cate: ", filterCriteria);
       return {
         id,
         slug,
@@ -342,6 +371,7 @@ export const productFiltersController = async (req, res) => {
         price,
         category_id,
         quantity,
+        volume,
         createdAt,
         updatedAt,
         photo: photoDataUri,
@@ -358,7 +388,7 @@ export const productFiltersController = async (req, res) => {
     console.log(error);
     res.status(400).send({
       success: false,
-      message: 'Error while filtering products',
+      message: "Error while filtering products",
       error: error.message,
     });
   }
@@ -391,11 +421,22 @@ export const productListController = async (req, res) => {
     const products = await Product.findAll({
       limit: perPage,
       offset,
-      order: [['createdAt', 'DESC']],
+      order: [["createdAt", "DESC"]],
     });
     const productsWithPhoto = products.map((product) => {
-      
-      const { id, slug , name, description, price, category_id, quantity, createdAt, updatedAt, photo} = product;
+      const {
+        id,
+        slug,
+        name,
+        description,
+        price,
+        category_id,
+        quantity,
+        volume,
+        createdAt,
+        updatedAt,
+        photo,
+      } = product;
 
       const photoDataUri = `data:image/jpeg;base64,${photo.toString("base64")}`;
       return {
@@ -406,6 +447,7 @@ export const productListController = async (req, res) => {
         price,
         category_id,
         quantity,
+        volume,
         createdAt,
         updatedAt,
         photo: photoDataUri,
@@ -441,8 +483,19 @@ export const searchProductController = async (req, res) => {
       },
     });
     const productsWithPhoto = results.map((product) => {
-      
-      const { id, slug , name, description, price, category_id, quantity, createdAt, updatedAt, photo} = product;
+      const {
+        id,
+        slug,
+        name,
+        description,
+        price,
+        category_id,
+        quantity,
+        volume,
+        createdAt,
+        updatedAt,
+        photo,
+      } = product;
 
       const photoDataUri = `data:image/jpeg;base64,${photo.toString("base64")}`;
       return {
@@ -453,11 +506,12 @@ export const searchProductController = async (req, res) => {
         price,
         category_id,
         quantity,
+        volume,
         createdAt,
         updatedAt,
         photo: photoDataUri,
       };
-    });  
+    });
     res.status(200).json(productsWithPhoto);
   } catch (error) {
     console.log(error);
@@ -513,19 +567,21 @@ export const moveProductController = async (req, res) => {
     if (!product) {
       return res.status(404).send({
         success: false,
-        message: 'Product not found',
+        message: "Product not found",
       });
     }
 
     const currentWarehouseName = product.warehouse;
 
     // Check if the new warehouse exists
-    const newWarehouse = await Warehouse.findOne({ where: { name: newWarehouseName } });
+    const newWarehouse = await Warehouse.findOne({
+      where: { name: newWarehouseName },
+    });
 
     if (!newWarehouse) {
       return res.status(404).send({
         success: false,
-        message: 'New warehouse not found',
+        message: "New warehouse not found",
       });
     }
 
@@ -535,17 +591,17 @@ export const moveProductController = async (req, res) => {
     // Check if there's enough available space in the new warehouse
     if (newWarehouse.availableAreaVolume < volumeToMove) {
       //toast.error('Not enough available space in the new warehouse');
-      console.log(newWarehouse)
-      return res.status(400).send({  
+      console.log(newWarehouse);
+      return res.status(400).send({
         success: false,
-        message: 'Not enough available space in the new warehouse',
+        message: "Not enough available space in the new warehouse",
       });
     }
 
     // Perform the move within a transaction
     await sequelize.transaction(async (t) => {
       // Decrease the quantity in the current warehouse
-      await Product.decrement('quantity', {
+      await Product.decrement("quantity", {
         by: product.quantity,
         where: { id: productId },
         transaction: t,
@@ -555,7 +611,7 @@ export const moveProductController = async (req, res) => {
       await product.update({ warehouse: newWarehouseName }, { transaction: t });
 
       // Increase the quantity in the new warehouse
-      await Product.increment('quantity', {
+      await Product.increment("quantity", {
         by: product.quantity,
         where: { id: productId },
         transaction: t,
@@ -564,7 +620,9 @@ export const moveProductController = async (req, res) => {
       // Update the availableVolume of the original warehouse (subtract the volume to move)
       await Warehouse.update(
         {
-          availableAreaVolume: sequelize.literal(`availableAreaVolume + ${volumeToMove}`),
+          availableAreaVolume: sequelize.literal(
+            `availableAreaVolume + ${volumeToMove}`
+          ),
         },
         {
           where: { name: currentWarehouseName },
@@ -575,7 +633,9 @@ export const moveProductController = async (req, res) => {
       // Update the availableVolume of the new warehouse (add the volume to move)
       await Warehouse.update(
         {
-          availableAreaVolume: sequelize.literal(`availableAreaVolume - ${volumeToMove}`),
+          availableAreaVolume: sequelize.literal(
+            `availableAreaVolume - ${volumeToMove}`
+          ),
         },
         {
           where: { name: newWarehouseName },
@@ -586,13 +646,13 @@ export const moveProductController = async (req, res) => {
 
     res.status(200).send({
       success: true,
-      message: 'Product moved to a new warehouse successfully',
+      message: "Product moved to a new warehouse successfully",
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: 'Error while moving product',
+      message: "Error while moving product",
       error: error.message,
     });
   }
@@ -629,11 +689,16 @@ export const updatedCartItems = async (req, res) => {
         const { id, amount } = cartItem;
 
         // Find the product by its ID in the database and lock it for the transaction
-        const product = await Product.findByPk(id, { transaction: t, lock: t.LOCK.UPDATE });
+        const product = await Product.findByPk(id, {
+          transaction: t,
+          lock: t.LOCK.UPDATE,
+        });
 
         // Check if there is enough quantity available in the database
         if (product.quantity < amount) {
-          return res.status(400).json({ success: false, message: 'Insufficient product quantity' });
+          return res
+            .status(400)
+            .json({ success: false, message: "Insufficient product quantity" });
         }
 
         // Deduct the specified quantity from the product's quantity
@@ -643,10 +708,12 @@ export const updatedCartItems = async (req, res) => {
     });
 
     // Respond with a success message
-    res.status(200).json({ success: true, message: 'Cart updated successfully' });
+    res
+      .status(200)
+      .json({ success: true, message: "Cart updated successfully" });
   } catch (error) {
-    console.error('Error updating cart:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error("Error updating cart:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -661,7 +728,10 @@ export const removeCartItems = async (req, res) => {
         const { id, amount } = cartItem;
 
         // Find the product by its ID in the database and lock it for the transaction
-        const product = await Product.findByPk(id, { transaction: t, lock: t.LOCK.UPDATE });
+        const product = await Product.findByPk(id, {
+          transaction: t,
+          lock: t.LOCK.UPDATE,
+        });
 
         // Add the specified quantity back to the product's quantity
         // product.quantity += amount;
@@ -670,10 +740,12 @@ export const removeCartItems = async (req, res) => {
     });
 
     // Respond with a success message
-    res.status(200).json({ success: true, message: 'Cart items removed successfully' });
+    res
+      .status(200)
+      .json({ success: true, message: "Cart items removed successfully" });
   } catch (error) {
-    console.error('Error removing cart items:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error("Error removing cart items:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -685,7 +757,7 @@ export const OrderAccept = async (req, res) => {
     await sequelize.transaction(async (t) => {
       // Update the order status to 'Accept' in the database
       await Order.update(
-        { status: 'Accept' },
+        { status: "Accept" },
         {
           where: {
             id: id,
@@ -698,14 +770,15 @@ export const OrderAccept = async (req, res) => {
       // There is no need to manually update product quantities here
 
       // Respond with a success message
-      res.status(200).json({ success: true, message: 'Order accepted successfully' });
+      res
+        .status(200)
+        .json({ success: true, message: "Order accepted successfully" });
     });
   } catch (error) {
-    console.error('Error accepting order:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error("Error accepting order:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
-
 
 //get product by category
 export const productCategoryController = async (req, res) => {
@@ -715,11 +788,22 @@ export const productCategoryController = async (req, res) => {
     const category = await Category.findOne({ where: { slug } });
 
     const products = await Product.findAll({
-      where: { category_id: category.id },
+      where: { category_id: category.name },
     });
     const productsWithPhoto = products.map((product) => {
-      
-      const { id, slug , name, description, price, category_id, quantity, createdAt, updatedAt, photo} = product;
+      const {
+        id,
+        slug,
+        name,
+        description,
+        price,
+        category_id,
+        quantity,
+        volume,
+        createdAt,
+        updatedAt,
+        photo,
+      } = product;
 
       const photoDataUri = `data:image/jpeg;base64,${photo.toString("base64")}`;
       return {
@@ -730,11 +814,12 @@ export const productCategoryController = async (req, res) => {
         price,
         category_id,
         quantity,
+        volume,
         createdAt,
         updatedAt,
         photo: photoDataUri,
       };
-    });  
+    });
 
     res.status(200).send({
       success: true,

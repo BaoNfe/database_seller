@@ -11,6 +11,10 @@ const CategoryModel = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    parent: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
   });
 
   return Category;

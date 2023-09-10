@@ -17,7 +17,7 @@ const HomePage = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [sortPrice, setSortPrice] = useState("asc");
-  const [sortCreatedTime, setSortCreatedTime] = useState("asc");
+  const [sortCreatedAt, setSortCreatedAt] = useState("asc");
   const [cartDataForServer, setCartDataForServer] = useState([]); // State to store cart data for server
 
 
@@ -25,8 +25,8 @@ const HomePage = () => {
     setSortPrice(e.target.value);
   };
 
-  const handleSortCreatedTime = (e) => {
-    setSortCreatedTime(e.target.value);
+  const handleSortCreatedAt = (e) => {
+    setSortCreatedAt(e.target.value);
   };
 
   //get all cat
@@ -91,8 +91,8 @@ const HomePage = () => {
   }, [checked.length]);
 
   useEffect(() => {
-    if (checked.length|| sortPrice.length || sortCreatedTime.length) filterProduct();
-  }, [checked, sortPrice, sortCreatedTime]);
+    if (checked.length|| sortPrice.length || sortCreatedAt.length) filterProduct();
+  }, [checked, sortPrice, sortCreatedAt]);
 
   //get filterd product
   const filterProduct = async () => {
@@ -100,7 +100,7 @@ const HomePage = () => {
       const { data } = await axios.post("/api/v1/product/product-filters", {
         checked,
         sortPrice,
-        sortCreatedTime,
+        sortCreatedAt,
       });
       setProducts(data?.products);
     } catch (error) {
@@ -171,11 +171,11 @@ const HomePage = () => {
             {categories?.map((c) => (
               <Checkbox
                 key={c.id}
-                onChange={(e) => handleFilter(e.target.checked, c.id)}
+                onChange={(e) => handleFilter(e.target.checked, c.name)}
               >
                 {c.name}
               </Checkbox>
-            ))}
+            ))} 
           </div>
           {/* price filter */}
           <h4 className="text-center mt-4">Sort By Price:</h4>
@@ -187,7 +187,7 @@ const HomePage = () => {
           </div>
           <h3 className="text-center mt-4" >Sort By Created Time:</h3>
           <div className="d-flex flex-column">
-            <Radio.Group value={sortCreatedTime} onChange={handleSortCreatedTime}>
+            <Radio.Group value={sortCreatedAt} onChange={handleSortCreatedAt}>
               <Radio.Button value="asc">Ascending</Radio.Button>
               <Radio.Button value="desc">Descending</Radio.Button>
             </Radio.Group>
