@@ -25,6 +25,7 @@ import Pagenotfound from "./pages/Pagenotfound.js"
 import AdminRoute from "./components/Routes/AdminRoute.js"
 import AdminDashboard from "./pages/Admin/AdminDashboard.js";
 import ProductsAdmin from "./pages/Admin/ProductsAdmin.js"
+import ProductAdmin from "./pages/Admin/ProductAdmin.js";
 function App() {
   return (
     <>
@@ -45,6 +46,7 @@ function App() {
       <Route path="/dashboard" element={<AdminRoute />}>
         <Route path="admin" element={<AdminDashboard />} />
         <Route path="admin/products" element={<ProductsAdmin />} />
+        <Route path="admin/product/:slug" element={<ProductAdmin />} />
         <Route path="admin/create-warehouse" element={<CreateWarehouse />} />
       </Route>
         <Route path="/" element={<HomePage />} />

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
-import SellerMenu from "../../components/Layout/SellerMenu";
 import Layout from "../../components/Layout/Layout";
 import { useNavigate } from "react-router-dom";
+import AdminMenu from "../../components/Layout/AdminMenu";
 
 const CreateWarehouse = () => {
   const navigate = useNavigate();
@@ -104,7 +104,7 @@ const CreateWarehouse = () => {
     <div className="container-fluid m-3 p-3 dashboard">
       <div className="row">
         <div className="col-md-3">
-          <SellerMenu />
+          <AdminMenu />
         </div>
         <div className="col-md-9">
           <h1>Create warehouse</h1>

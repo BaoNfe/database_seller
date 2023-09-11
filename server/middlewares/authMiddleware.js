@@ -56,7 +56,7 @@ export const isAdmin = async (req, res, next) => {
     res.status(401).send({
       success: false,
       error,
-      message: "Error in seller middelware",
+      message: "Error in Admin middelware",
     });
   }
 };

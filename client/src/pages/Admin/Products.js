@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import SellerMenu from "../../components/Layout/SellerMenu";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import Layout from "../../components/Layout/Layout";
+import AdminMenu from "../../components/Layout/AdminMenu";
 const Products = () => {
   const [products, setProducts] = useState([]);
 
@@ -26,7 +26,7 @@ const Products = () => {
     <Layout>
       <div className="row dashboard">
         <div className="col-md-3">
-          <SellerMenu />
+          <AdminMenu />
         </div>
         <div className="col-md-9 ">
           <h1 className="text-center">All Products List</h1>
