@@ -113,7 +113,7 @@ const CreateWarehouse = () => {
               <input
                 type="text"
                 value={name}
-                placeholder="write a name"
+                placeholder="Name"
                 className="form-control"
                 onChange={(e) => setName(e.target.value)}
               />
@@ -122,7 +122,7 @@ const CreateWarehouse = () => {
               <input
                 type="text"
                 value={province}
-                placeholder="write a Province"
+                placeholder="Province"
                 className="form-control"
                 onChange={(e) => setProvince(e.target.value)}
               />
@@ -132,7 +132,7 @@ const CreateWarehouse = () => {
               <input
                 type="text"
                 value={city}
-                placeholder="write a City"
+                placeholder="City"
                 className="form-control"
                 onChange={(e) => setCity(e.target.value)}
               />
@@ -141,7 +141,7 @@ const CreateWarehouse = () => {
               <input
                 type="text"
                 value={district}
-                placeholder="write a district"
+                placeholder="District"
                 className="form-control"
                 onChange={(e) => setDistrict(e.target.value)}
               />
@@ -150,7 +150,7 @@ const CreateWarehouse = () => {
               <input
                 type="text"
                 value={street}
-                placeholder="write a street"
+                placeholder="Street"
                 className="form-control"
                 onChange={(e) => setStreet(e.target.value)}
               />
@@ -159,7 +159,7 @@ const CreateWarehouse = () => {
               <input
                 type="text"
                 value={number}
-                placeholder="write a number"
+                placeholder="Number"
                 className="form-control"
                 onChange={(e) => setNumber(e.target.value)}
               />
@@ -168,7 +168,7 @@ const CreateWarehouse = () => {
               <input
                 type="text"
                 value={totalAreaVolume}
-                placeholder="write a total area"
+                placeholder="Total Area"
                 className="form-control"
                 onChange={(e) => setTotalArea(e.target.value)}
               />
@@ -195,10 +195,10 @@ const CreateWarehouse = () => {
                   <tr key={c.name}>
                     <td>
                       <div>
-                        {c.name} <br />
-                        {"address: "}
-                        {c.province} {c.city} {c.district} {c.street} {c.number} <br />
-                        {"Total volumn: "}{c.totalAreaVolume} {c.availableAreaVolume}
+                        {"Name: "}{c.name} <br />
+                        {"address: "} {c.number} {c.street} {c.district} {c.city} {c.province}  <br />
+                        {"Total volumn: "}{c.totalAreaVolume} <br/> 
+                        {"Remaining Area: "}{c.availableAreaVolume}
                       </div>
                     </td>
                     <td>

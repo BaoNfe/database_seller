@@ -10,7 +10,7 @@ MYSQL_DATABASE = data_group //name of the database)
 Also, change the config.json file in "./server/config/config.json" accordingly 
 
 Once connected inside the mysql database, run these sql file for stored procedure and trigger:
-"
+"accept-trigger.sql, reject-procedure.sql, reject-trigger.sql, store_product.sql, trigger.sql"
 
 Open 2 terminal (or just split the terminal). 
 One terminal will navigate to the "/server", and the other terminal will navigate to the "/client"
@@ -19,6 +19,13 @@ In both terminal, run "npm install"
 
 And the project should be running
 
-For creating user, currently our project set the default role of new register users by 2, if you want to make it into admin account, go to mysql database and change the field role to 0 (or change to 1 for seller)
+For creating user, currently our project set the default role of new register users by 2, 
+if you want to make it into admin account, go to mysql database and change the field role to 0 (or change to 1 for seller)
 
 
+TEAM MEMBER CONTRIBUTION:
+name                    sid                      score
+Ngo Nhat Minh           s3838104                   5
+Nguyen Quoc Bao         s3803885                   5
+Nguyen Duc Khang        s3824317                   5
+Nguyen Ha Minh Duy      s3852307                   5   

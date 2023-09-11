@@ -11,7 +11,7 @@ const SellerDashboard = () => {
           </div>
           <div className="col-md-9">
             <div className="card w-75 p-3">
-              <h1>YEH THIS IS SELLER</h1>
+              <h1>SELLER DASHBOARD</h1>
             </div>
           </div>
         </div>
